@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -11,6 +13,27 @@ import (
 )
 
 const TOPIC string = "/topic/TD_LNE_GN_SIG_AREA"
+
+// Store in memory current berth state
+var berths map[string]string
+
+type Messages []Type
+
+type Type struct {
+	CA Message `json:"CA_MSG"`
+	CB Message `json:"CB_MSG"`
+	CC Message `json:"CC_MSG"`
+	CT Message `json:"CT_MSG"`
+}
+
+type Message struct {
+	AreaID  string `json:"area_id"`
+	Descr   string `json:"descr"`
+	From    string `json:"from"`
+	MsgType string `json:"msg_type"`
+	Time    string `json:"time"`
+	To      string `json:"to"`
+}
 
 func flags() *pflag.FlagSet {
 	// Create flagset
@@ -44,6 +67,13 @@ func cli(flags *pflag.FlagSet, run func(cmd *cobra.Command, args []string)) *cob
 }
 
 func run(cmd *cobra.Command, args []string) {
+	// Message hub
+	hub := NewHub()
+	go hub.Run()
+
+	// Websocket Service
+	ws := NewWSService(hub)
+
 	// Connect to STOMP
 	conn := fmt.Sprintf("%v:%v", viper.GetString("addr"), viper.GetString("port"))
 	s, _ := stomp.Dial("tcp", conn, stomp.Options{
@@ -55,10 +85,18 @@ func run(cmd *cobra.Command, args []string) {
 	sub, _ := s.Subscribe(TOPIC, stomp.AckClient)
 
 	// Get messages
-	for {
-		msg := <-sub.C
-		fmt.Println(string(msg.Body[:]))
-	}
+	go func() {
+		for {
+			msg := <-sub.C
+			messages := &Messages{}
+
+			json.Unmarshal(msg.Body, messages)
+
+			fmt.Printf("%+v\n", messages)
+		}
+	}()
+
+	http.ListenAndServe(":5000", ws)
 }
 
 func main() {

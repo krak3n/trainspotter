@@ -2,9 +2,13 @@
 gopkg.in/stomp.v1
 
 # Logging
-github.com/Sirupsen/logrus  418b41d23a1bf978c06faea5313ba194650ac088
+github.com/Sirupsen/logrus      418b41d23a1bf978c06faea5313ba194650ac088
 
 # Config / CLI Interface
-github.com/spf13/cobra      d732ab3a34e6e9e6b5bdac80707c2b6bad852936
-github.com/spf13/viper      1967d93db724f4a5c0e101307e96d82ff520a067
-github.com/spf13/pflag      b084184666e02084b8ccb9b704bf0d79c466eb1d
+github.com/spf13/cobra          d732ab3a34e6e9e6b5bdac80707c2b6bad852936
+github.com/spf13/viper          1967d93db724f4a5c0e101307e96d82ff520a067
+github.com/spf13/pflag          b084184666e02084b8ccb9b704bf0d79c466eb1d
+
+# Websockets
+
+github.com/gorilla/websocket    c66b764651cdca39f42d263b07a507c6e8b58ee9
