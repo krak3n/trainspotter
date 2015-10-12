@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -13,27 +12,6 @@ import (
 )
 
 const TOPIC string = "/topic/TD_LNE_GN_SIG_AREA"
-
-// Store in memory current berth state
-var berths map[string]string
-
-type Messages []Type
-
-type Type struct {
-	CA Message `json:"CA_MSG"`
-	CB Message `json:"CB_MSG"`
-	CC Message `json:"CC_MSG"`
-	CT Message `json:"CT_MSG"`
-}
-
-type Message struct {
-	AreaID  string `json:"area_id"`
-	Descr   string `json:"descr"`
-	From    string `json:"from"`
-	MsgType string `json:"msg_type"`
-	Time    string `json:"time"`
-	To      string `json:"to"`
-}
 
 func flags() *pflag.FlagSet {
 	// Create flagset
@@ -88,11 +66,12 @@ func run(cmd *cobra.Command, args []string) {
 	go func() {
 		for {
 			msg := <-sub.C
-			messages := &Messages{}
-
-			json.Unmarshal(msg.Body, messages)
-
-			fmt.Printf("%+v\n", messages)
+			fmt.Println("-----------------------------")
+			if msg.Body != nil {
+				fmt.Println(string(msg.Body[:]))
+				Process(msg.Body, hub)
+			}
+			fmt.Println("-----------------------------")
 		}
 	}()
 
