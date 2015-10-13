@@ -7,6 +7,8 @@ import (
 	"fmt"
 )
 
+const KX string = "KX"
+
 // Store in memory current berth state
 var berths map[string]*Berth = make(map[string]*Berth)
 
@@ -24,7 +26,7 @@ type Type struct {
 }
 
 type Message struct {
-	AreaID  *string `json:"area_id omitempty"`
+	AreaID  string  `json:"area_id omitempty"`
 	Descr   *string `json:"descr,omitempty"`
 	From    *string `json:"from,omitempty"`
 	MsgType *string `json:"msg_type,omitempty"`
@@ -52,18 +54,19 @@ func Process(body []byte, h Hub) {
 		}
 
 		if m != nil {
-
-			if m.To != nil {
-				berths[*m.To] = &Berth{
-					Headcode: m.Descr,
+			if m.AreaID == KX {
+				if m.To != nil {
+					berths[*m.To] = &Berth{
+						Headcode: m.Descr,
+					}
 				}
-			}
-			if m.From != nil {
-				berths[*m.From] = nil
-			}
+				if m.From != nil {
+					berths[*m.From] = nil
+				}
 
-			d, _ := json.Marshal(berths)
-			h.Broadcast <- d
+				d, _ := json.Marshal(berths)
+				h.Broadcast <- d
+			}
 		}
 	}
 }
