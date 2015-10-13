@@ -26,7 +26,7 @@ type Type struct {
 }
 
 type Message struct {
-	AreaID  string  `json:"area_id omitempty"`
+	AreaID  string  `json:"area_id,omitempty"`
 	Descr   *string `json:"descr,omitempty"`
 	From    *string `json:"from,omitempty"`
 	MsgType *string `json:"msg_type,omitempty"`
