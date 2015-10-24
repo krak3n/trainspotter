@@ -10,7 +10,7 @@ import (
 const KX string = "KX"
 
 // Store in memory current berth state
-var berths map[string]*Berth = make(map[string]*Berth)
+var Berths map[string]*Berth = make(map[string]*Berth)
 
 type Berth struct {
 	Headcode *string `json:"headcode"`
@@ -56,15 +56,15 @@ func Process(body []byte, h Hub) {
 		if m != nil {
 			if m.AreaID == KX {
 				if m.To != nil {
-					berths[*m.To] = &Berth{
+					Berths[*m.To] = &Berth{
 						Headcode: m.Descr,
 					}
 				}
 				if m.From != nil {
-					berths[*m.From] = nil
+					Berths[*m.From] = nil
 				}
 
-				d, _ := json.Marshal(berths)
+				d, _ := json.Marshal(Berths)
 				h.Broadcast <- d
 			}
 		}

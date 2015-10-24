@@ -3,6 +3,7 @@
 package main
 
 import (
+	"encoding/json"
 	"net"
 	"net/http"
 	"time"
@@ -50,6 +51,8 @@ func (h *Hub) Run() {
 		// On register messages, store the connection
 		case c := <-h.register:
 			h.connections[c] = true
+			d, _ := json.Marshal(Berths)
+			c.send <- d
 		// On unregister messsages, delete the connection from the pool
 		case c := <-h.unregister:
 			if _, ok := h.connections[c]; ok {
